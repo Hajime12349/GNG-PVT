@@ -29,6 +29,7 @@ class SARTApp:
         self.root = root
         self.root.title("GNG-PVT")
         self.root.geometry("800x700")
+        root.attributes('-fullscreen', True)
 
         self.data_dir = "recoded_data"
         if not os.path.exists(self.data_dir):
@@ -46,9 +47,9 @@ class SARTApp:
 
         # 設定可能変数
         self.target_number = 0
-        self.max_trials = 90
-        self.min_interval_s = 1
-        self.max_interval_s = 5
+        self.max_trials = 3
+        self.min_interval_s = 0.5
+        self.max_interval_s = 5.0
         self.response_limit_ms = 1500
         self.response_outlier_ms = 100
 
@@ -403,6 +404,7 @@ class SARTApp:
 
         avg_rt = round(sum(self.reaction_times) / len(self.reaction_times)) if self.reaction_times else None
         worst_rt = round(max(self.reaction_times)) if self.reaction_times else None
+        self.rt_std_dev_ms = round(statistics.stdev(self.reaction_times))
 
         data_to_save = {
             "datetime_iso": timestamp_obj.isoformat(),
@@ -486,9 +488,7 @@ class SARTApp:
             worst_rt_str = f"{worst_rt_val} ms"
             
             if len(self.reaction_times) >= 2:
-                try:self.rt_std_dev_ms = round(statistics.stdev(self.reaction_times))
-                except: self.rt_std_dev_ms = None
-            rt_std_dev_str = f"{self.rt_std_dev_ms} ms" if self.rt_std_dev_ms is not None else "N/A"
+                self.rt_std_dev_str = f"{self.rt_std_dev_ms} ms" if self.rt_std_dev_ms is not None else "N/A"
         else:
             avg_rt_str = "N/A"
             worst_rt_str = "N/A"
@@ -501,7 +501,7 @@ class SARTApp:
             f"外れ値: {self.commission_outliers+self.omission_outliers}\n\n"
             f"平均反応時間 : {avg_rt_str}\n"
             f"最悪反応時間 : {worst_rt_str}\n"
-            f"反応時間標準偏差: {rt_std_dev_str}\n"
+            f"反応時間標準偏差: {self.rt_std_dev_str}\n"
         )
         ttk.Label(main_results_frame, text=results_text, font=self.text_font, justify=tk.LEFT).pack(pady=10, anchor='nw')
 
