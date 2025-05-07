@@ -166,7 +166,6 @@ class SARTApp:
             random.shuffle(sequence)
             if all(not (sequence[i] == sequence[i+1] and sequence[i]==self.target_number)  for i in range(len(sequence)-1)):
                 self.sequence=sequence
-                print(sequence)
                 return
 
         # 調整失敗時のフォールバック
