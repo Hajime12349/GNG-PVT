@@ -44,14 +44,16 @@ class SARTApp:
         self.test_frame = None
         self.results_frame = None
 
+        # 設定可能変数
         self.target_number = 0
-        self.max_trials = 3
+        self.max_trials = 2
         self.min_interval_s = 1
         self.max_interval_s = 5
         self.response_limit_ms = 1500
         self.response_outlier_ms = 100
 
         self.target_number = 0
+        self.sequence=[]
         self.current_stimulus = 0
         self.previous_stimulus = 0
         self.number_counts = {i: 0 for i in range(1, 10)}
@@ -126,6 +128,8 @@ class SARTApp:
             self.target_number = random.randint(1, 9)
         ttk.Label(self.start_frame, text=f"今回のターゲット数字: {self.target_number}", font=self.text_font).pack(pady=10)
 
+        self.generate_sequence()
+
         explanation = (
             "画面に1から9までの数字が順番に表示されます。\n"
             f"ターゲット数字（今回は「{self.target_number}」）以外の数字が表示されたら、\n"
@@ -141,6 +145,33 @@ class SARTApp:
         start_button.focus_set()
         self.root.bind("<Return>", lambda event: start_button.invoke())
 
+    def generate_sequence(self):
+    
+        required_target_count = int(self.max_trials / 9.0)
+        sequence = [self.target_number] * required_target_count
+        
+        number_range=range(1, 10)
+
+        # 残りをランダムに1以外の数で埋める
+        remaining_count = self.max_trials - required_target_count
+        other_numbers = [n for n in number_range if n != self.target_number]
+        sequence += [random.choice(other_numbers) for _ in range(remaining_count)]
+
+        #For Debugging
+        #print(sequence)
+        
+        # シャッフルしつつ連続チェック
+        max_attempts = 1000
+        for _ in range(max_attempts):
+            random.shuffle(sequence)
+            if all(not (sequence[i] == sequence[i+1] and sequence[i]==self.target_number)  for i in range(len(sequence)-1)):
+                self.sequence=sequence
+                print(sequence)
+                return
+
+        # 調整失敗時のフォールバック
+        raise RuntimeError("連続しないように配置できませんでした。")
+    
     def reset_test_variables(self):
         self.current_stimulus = 0
         self.previous_stimulus = 0
@@ -198,19 +229,13 @@ class SARTApp:
         interval_ms = random.randint(self.min_interval_s * 1000, self.max_interval_s * 1000)
         self.current_isi_ms = interval_ms
         self.interval_timer_id = self.root.after(interval_ms, self.display_stimulus)
-
+    
     def select_stimulus(self):
-        available_stimuli = []
-        for num in range(1, 10):
-            if self.number_counts[num] < (self.max_trials / 9.0) and num != self.previous_stimulus:
-                available_stimuli.append(num)
-
-        if not available_stimuli:
-            available_stimuli = [num for num in range(1,10) if self.number_counts[num] < (self.max_trials / 9.0)]
-            if not available_stimuli:
-                return None
-
-        return random.choice(available_stimuli)
+        if len(self.sequence)==0:
+            return None
+        
+        choiced_number=self.sequence.pop(-1)
+        return choiced_number
 
     def display_stimulus(self):
         if not self.test_in_progress:
