@@ -47,7 +47,7 @@ class SARTApp:
 
         # 設定可能変数
         self.target_number = 0
-        self.max_trials = 3
+        self.max_trials = 90
         self.min_interval_s = 0.5
         self.max_interval_s = 5.0
         self.response_limit_ms = 1500
