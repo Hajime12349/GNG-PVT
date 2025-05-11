@@ -24,7 +24,7 @@ except ImportError:
     print("警告: Pillowライブラリが見つかりません。グラフ表示機能は無効になります。`pip install Pillow`でインストールしてください。")
 
 
-class SARTApp:
+class PVTApp:
     def __init__(self, root):
         self.root = root
         self.root.title("GNG-PVT")
@@ -562,5 +562,5 @@ if __name__ == "__main__":
         print("--- Pillowが利用できないため、グラフ表示機能は動作しません。 ---")
         
     root = tk.Tk()
-    app = SARTApp(root)
+    app = PVTApp(root)
     root.mainloop()
