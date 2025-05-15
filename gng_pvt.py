@@ -419,7 +419,6 @@ class PVTApp:
                 "commission_errors": self.commission_errors, # Pressed on target
                 "outliers_commission_too_fast": self.commission_outliers, # Pressed too fast
                 "outliers_omission_too_late": self.omission_outliers, # Timed out on non-target
-                "total_correct_responses": total_correct_responses,
                 "accuracy_percentage": accuracy_percent,
                 "average_reaction_time_ms": avg_rt,
                 "worst_reaction_time_ms": worst_rt,
@@ -489,8 +488,8 @@ class PVTApp:
 
         ttk.Label(main_results_frame, text="テスト結果", font=self.title_font).pack(pady=10)
 
-        total_correct_responses_val = self.correct_go_responses + self.correct_no_go_responses
-        accuracy_percent = round((total_correct_responses_val / self.total_trials_conducted) * 100, 2) if self.total_trials_conducted > 0 else 0.0
+        total_correct_responses_val = self.correct_no_go_responses
+        accuracy_percent = round((total_correct_responses_val / self.target_trials) * 100, 2) if self.total_trials_conducted > 0 else 0.0
         
         avg_rt_str = "N/A"; worst_rt_str = "N/A"; rt_std_dev_str = "N/A"
         # Use reaction_times from correct Go trials for meaningful stats, if desired
@@ -511,10 +510,9 @@ class PVTApp:
         
         results_text = (
             f"総試行数: {self.total_trials_conducted}\n\n"
-            f"正答率: {accuracy_percent} % (総正解数: {total_correct_responses_val})\n"
+            f"正答率: {accuracy_percent} % \n"
             f"  正反応 (Go): {self.correct_go_responses}\n"
             f"  正抑制 (NoGo): {self.correct_no_go_responses}\n"
-            f"誤り (ターゲットを押した): {self.commission_errors}\n"
             f"外れ値 (早すぎ): {self.commission_outliers}\n"
             f"外れ値 (遅すぎ/見逃し): {self.omission_outliers}\n\n"
             f"平均反応時間 : {avg_rt_str}\n"
